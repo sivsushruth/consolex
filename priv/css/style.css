@@ -6,128 +6,37 @@ body {
 .shell {
 }
 
+.launch-options {
+  padding-left: 1rem;
+}
+
+#other-task-input {
+  display: none;
+}
+
+.terminate-shell-btn {
+  display: none;
+}
+
 .CodeMirror {
   height: calc(100vh - 40px);
+}
+
+.console-log-input {
+  background-color: #151515;
 }
 
 #editor-holder {
   padding-left: 1rem !important;
   padding-right: 0px !important;
 }
+
 #console-log-holder {
   padding-left: 0px !important;
   padding-right: 1rem !important;
 }
+
 #console-log-holder .cm-s-text-ex-machina
 {
   background-color: #2C2C2C;
 }
-
-/*#console-holder {
-    position: relative;
-    width: 50vw;
-    float:right;
-}
-
-#console-holder .cm-s-text-ex-machina {
-    background: #2F2F2F;
-}
-
-#editor-holder {
-    position: relative;
-    width: 50vw;
-    float: left;
-}
-
-#editor {
-    position: relative;
-}
-
-.CodeMirror {
-    height: 80vh;
-}
-
-#controls{
-    position: fixed;
-    bottom: 5vh;
-}
-
-#controls input[type="text"] {
-  padding: 10px;
-  border: none;
-  border-bottom: solid 2px #c9c9c9;
-  transition: border 0.3s;
-}
-
-#controls input[type="text"]:focus,
-
-#controls input[type="text"].focus {
-  border-bottom: solid 2px #969696;
-}
-
-.console-log-input {
-    color: green !important; 
-    background-color: #141531 !important;
-}
-
-#shell-controls {
-    display: none;
-    width: 100vw;
-    margin-left: 0.4vw;
-}
-
-#command-history {
-    width: 50vw;
-    position: absolute;
-    z-index: 9;
-    left: 0;
-    right: 0;
-    overflow-y: scroll;
-    margin-left: 0vw;
-    margin-top: 25vh;
-    height: 55vh;
-    margin-right: auto;
-    background-color: #2F2F2F;
-    min-height: 55vh;
-    display: none;
-}
-
-#start-shell {
-    margin-left: 20vw;
-}
-
-#clear-editor-btn {
-    float: left;
-}
-
-#clear-console-btn {
-    float: right;
-}
-
-.command-history-entry {
-    padding: 1.1rem;
-    line-height: 1.5rem;
-    padding-top: 1.7rem;
-    padding-bottom: 1.7rem;
-    max-height: 4.2rem;
-    cursor: pointer;
-    background-color: #141531;
-    overflow: hidden;
-}
-
-.command-history-entry:hover {
-    background-color: #0E1035;
-}
-
-.command-history-entry:hover::before {
-    content: "Open in editor";
-    position: absolute;
-    font-style: italic;
-    margin-top: -1.4rem;
-    font-size: 0.8rem;
-    color: #2DA9FF
-}
-
-.command-history-entry-divider {
-
-}*/

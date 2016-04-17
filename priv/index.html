@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/css/style.css">
 
     <script src="js/jquery.min.js"></script>
+    <script src="js/lockr.js"></script>
     <script src="js/semantic.min.js"></script>
     <script src="js/codemirror.js"></script>
     <script src="js/elixir.js"></script>
@@ -30,9 +31,10 @@
             <a href="#" class="header item">
                 ConsoleX
             </a>
-            <a href="javascript:$('.task-modal').modal('show')" class="item">Launch</a>
             <a href="#" class="item">History</a>
         </div>
+        <a href="javascript:$('.task-modal').modal('show')" class="item">Launch</a>
+        <a href="#" class="item red terminate-shell-btn">Terminate shell</a>
     </div>
     <div class="ui grid shell">
         <div class="eight wide column editor" id='editor-holder'>
@@ -46,54 +48,36 @@
         <div class="header">
             <h2> Launch Settings </h2>
         </div>
-        <div class="description">
-            <p>You can start an IEX shell session with the following commands:</p>
+        <div class="description launch-options">
+            <p class="ui">Choose a command to start IEX with:</p>
             <div class="ui form">
                 <div class="grouped fields">
                     <div class="field">
                         <div class="ui radio checkbox">
-                        <input type="radio" name="task" checked="checked">
-                        <label>iex</label>
+                            <input type="radio" name="task" checked="checked" value="iex">
+                            <label>iex</label>
                         </div>
                     </div>
                     <div class="field">
                         <div class="ui radio checkbox">
-                        <input type="radio" name="task">
-                        <label>iex -S mix</label>
+                            <input type="radio" name="task" value="iex -S mix">
+                            <label>iex -S mix</label>
                         </div>
                     </div>
                     <div class="field">
                         <div class="ui radio checkbox">
-                        <input type="radio" name="task">
-                        <label>Other</label>
+                            <input type="radio" name="task" value="other">
+                            <label>Other <input id="other-task-input" type="text" value="iex -S mix" placeholder="iex -S mix phoenix.server"></label>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="actions">
-            <div class="ui button">Cancel</div>
-            <div class="ui button">OK</div>
+            <div class="ui negative button">Cancel</div>
+            <div class="ui positive button launch-shell">Launch Shell</div>
         </div>
     </div>
 </body>
-
-<script>
-  var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
-    lineNumbers: true,
-    mode: "elixir",
-    theme: "text-ex-machina"
-  });
-
-  var consoleLog = CodeMirror.fromTextArea(document.getElementById("console-log"), {
-    theme: "text-ex-machina",
-    readOnly: true
-  });
-
-  $(document).ready(function(){
-    $(".task-modal").modal("show");
-  })
-
-</script>
-
+<script src="js/consolex.js"></script>
 </html>

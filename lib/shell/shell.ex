@@ -13,7 +13,9 @@ defmodule Consolex.Shell do
       {:send, input} ->
         IO.inspect input
         execute_inputs(input, port)
-      data ->
+      {:terminate} -> 
+        exit(:shutdown)
+      data->
         Consolex.reply(websocket_handler, "#{inspect data}")
     end 
     loop(port, websocket_handler)

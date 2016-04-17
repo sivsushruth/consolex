@@ -13,6 +13,10 @@ defmodule Consolex do
     GenServer.cast(shell, {:execute, command})
   end
 
+  def terminate(shell) do
+    GenServer.cast(shell, {:terminate})
+  end
+
   def reply(shell, msg) do
     GenServer.cast(shell, {:reply, msg})
   end
@@ -27,6 +31,11 @@ defmodule Consolex do
 
   def handle_cast({:start_shell, task, shell}, {:pid, pid}) do
     port = Kernel.spawn_link(fn -> Consolex.Shell.start_port(task, shell) end) 
+    {:noreply, [{:port, port}, {:pid, pid}]}
+  end
+
+  def handle_cast({:terminate}, [{:port, port}, {:pid, pid}]) do
+    send(port, {:terminate})
     {:noreply, [{:port, port}, {:pid, pid}]}
   end
 
