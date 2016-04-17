@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Consolex do
+defmodule Mix.Tasks.Consolex.Server do
   use Mix.Task
 
   def run(_) do

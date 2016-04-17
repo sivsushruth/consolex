@@ -10,7 +10,7 @@ defmodule Consolex.Server do
         {"/js/[...]", :cowboy_static, {:priv_dir, :consolex, "js"}}
         ]}
       ])
-    IO.inspect "Started listening on port 5984..."
+    IO.puts "Started listening on port 5984..."
     :cowboy.start_http :my_http_listener, 100, [{:port, 5984}], [{:env, [{:dispatch, dispatch}]}]
     Consolex.WebSocketHandlerSup.start_link([])
   end
