@@ -15,35 +15,63 @@
 
     <script src="js/jquery.min.js"></script>
     <script src="js/lockr.js"></script>
+    <script src="js/clipboard.js"></script>
     <script src="js/semantic.min.js"></script>
     <script src="js/codemirror.js"></script>
     <script src="js/elixir.js"></script>
-
-<!--[if lt IE 9]>
-<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<![endif]-->
+    <script src="js/jsrender.js"></script>
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 </head>
 
 <body>
-
     <div class="ui fixed inverted menu">
         <div class="ui container">
             <a href="#" class="header item">
                 ConsoleX
             </a>
-            <a href="#" class="item">History</a>
+            <a href="javascript:$('.command-history-modal').modal('show')" class="item">History</a>
         </div>
         <a href="javascript:$('.task-modal').modal('show')" class="item">Launch</a>
-        <a href="#" class="item red terminate-shell-btn">Terminate shell</a>
+        <a href="#" class="item red terminate-shell-btn shell-only">Terminate shell</a>
+        <a href="#" class="item red clear-shell-btn shell-only">Clear shell</a>
     </div>
     <div class="ui grid shell">
         <div class="eight wide column editor" id='editor-holder'>
+            <div class="ui grid editor-controls">
+                <div class="field clear-on-send six wide column">
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="clear-on-send">
+                        <label class="label">Clear editor on send</label>
+                    </div>
+                </div>
+                <div class="ten wide column right aligned">
+                    <button onclick="executeCode()" class="ui button green send-to-shell-btn">
+                        Send to shell (Ctrl/Cmd + Enter)
+                    </button>
+                </div>
+            </div>    
             <textarea id="editor"></textarea>
         </div>
         <div class="eight wide column textarea" id='console-log-holder'>
             <textarea id="console-log">Console</textarea>
         </div>
     </div>
+    
+    <div class="ui small modal command-history-modal">
+        <div class="header">
+            <h2> Command History <button onclick="clearCommandHistory()" class="ui button basic red erase-command-history">Erase command history</button></h2>
+        </div>
+        <div class="description">
+            <table class="ui table simple padded fluid command-history-table">                             
+            </table>
+        </div>
+        <div class="actions">
+            <div class="ui negative button">Close</div>
+        </div>
+    </div>
+
     <div class="ui small modal task-modal">
         <div class="header">
             <h2> Launch Settings </h2>
@@ -79,5 +107,19 @@
         </div>
     </div>
 </body>
+<script id="command-history-entry" type="text/x-jsrender">
+    <tr>
+        <td><h4>{{:id}}</h4></td>
+        <td> 
+            <div data-clipboard-text="{{:rawCommand}}" class="ui segment history-code-segment">
+               <p class="ui small copy-command">Click to copy</p>
+               <p class="history-code">{{:command}}</p>
+            </div>
+        </td>
+        <td>
+            <button class="ui button basic green open-in-editor-btn" data-raw-command="{{:rawCommand}}">Open in Editor</button>
+        </td>   
+    </tr>
+</script>
 <script src="js/consolex.js"></script>
 </html>

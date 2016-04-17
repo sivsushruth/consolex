@@ -39,17 +39,20 @@ defmodule Consolex.WebSocketHandler do
   end
   
   def websocket_handle({:text, content}, req, [{:shell, shell}, {:pid, pid}]) do
-    case JSX.is_json?(content) do
-      true -> 
-        {:ok, content_map} = JSX.decode(content)
+    is_json = JSX.is_json?(content)
+    if is_json do
+      {:ok, content_map} = JSX.decode(content)
+    end
+    case is_json do
+      true when is_map(content_map) -> 
         case Map.fetch(content_map, "task") do
           {:ok, "terminate"} -> 
             Consolex.terminate(shell)    
-            {:reply, {:text, "Terminated shell."}, req, {:pid, pid}}
+            {:reply, {:text, "Terminated shell"}, req, {:pid, pid}}
            _ ->
             {:reply, {:text, "Could not understand task"}, req, [{:shell, shell}, {:pid, pid}]}
         end
-      false -> 
+      _ -> 
         Consolex.execute(shell, content)
         {:ok, req, [{:shell, shell}, {:pid, pid}]}
     end    

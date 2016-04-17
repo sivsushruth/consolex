@@ -6,6 +6,30 @@ body {
 .shell {
 }
 
+.editor-controls {
+  bottom: 1em;
+  z-index: 9;
+  width:47vw;
+  left:4vw;
+  position: fixed;
+}
+
+.clear-on-send {
+  padding-top: 2rem !important;
+}
+
+.send-to-shell-btn {
+
+}
+
+.clear-on-send .label {
+  color: white !important;
+}
+
+.erase-command-history {
+  float: right;
+}
+
 .launch-options {
   padding-left: 1rem;
 }
@@ -39,4 +63,23 @@ body {
 #console-log-holder .cm-s-text-ex-machina
 {
   background-color: #2C2C2C;
+}
+
+.history-code-segment {
+  background-color: #F0F1F1 !important;
+  cursor: pointer;
+}
+
+.copy-command {
+    display: none;
+    position: absolute;
+    margin-right: 1em;
+    right: 0;
+    color: #929292;
+    font-style: italic;
+}
+
+.history-code {
+  max-height: 12.4em;
+  overflow: hidden;
 }

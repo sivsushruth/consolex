@@ -3,6 +3,14 @@ if (commandHistoryStored = Lockr.get('commandHistory')) {
     commandHistory = commandHistoryStored;
 }
 
+updateCommandHistory(null);
+
+function clearCommandHistory() {
+    Lockr.rm("commandHistory")
+    commandHistory = []
+    updateCommandHistory(null);
+}
+
 var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     lineNumbers: true,
     mode: "elixir",
@@ -47,7 +55,7 @@ function go() {
     ws.onopen = function () {}
     ws.onclose = function () {
       consoleLog.setValue("Launch again\nReason : disconnected from shell, shell terminated")
-      go()
+      setTimeout(function() {go()}, 10000);
     }
     ws.onmessage = function (e) {        
         if(!isTerminated) {
@@ -65,11 +73,43 @@ function startShell(task) {
 function executeCode() {
     msg = editor.getValue()
     updateConsoleLog(msg, true)
-    // commandHistory = [msg]
-    commandHistory.push(msg)
-    console.log(commandHistory)
-    Lockr.set('commandHistory', commandHistory);
+    updateCommandHistory(msg)
     ws.send(msg)
+}
+
+function updateCommandHistory(msg) {
+    if(msg) {
+        commandHistory.push(msg)
+        Lockr.set('commandHistory', commandHistory);
+    }
+
+    var tmpl = $.templates("#command-history-entry");
+    for(var i=0; i< commandHistory.length; i++) {
+        var entry = {
+            id: i+1, 
+            command: commandHistory[commandHistory.length-i-1].replace(/(?:\r\n|\r|\n)/g, '<br />'), 
+            rawCommand: commandHistory[commandHistory.length-i-1]
+        }
+        var html = tmpl.render(entry);
+        $(".command-history-table").append(html);
+        new Clipboard('.history-code-segment');
+
+    }
+    if($("input[name=clear-on-send]").is(":checked")) {
+        editor.setValue("")        
+    }
+    $(".history-code-segment").hover(function() {
+            console.log($(this).find(".copy-command"))
+            $(this).find(".copy-command").show()
+        }, function() {
+            console.log(this)
+            $(this).find(".copy-command").hide()
+        }
+    )
+    $(".open-in-editor-btn").click(function() {
+        $('.command-history-modal').modal('hide')
+        editor.setValue($(this).data("raw-command"))
+    })
 }
 
 var isTerminated = false;
@@ -81,8 +121,12 @@ $(".terminate-shell-btn").click(function(){
     go()
 })
 
+$(".clear-shell-btn").click(function() {
+    consoleLog.setValue("Cleared \n")
+})
 
 function updateConsoleLog(data, isInput){
+    console.log(data)
     var doc = consoleLog.getDoc();
     var cursor = doc.getCursor();
     var initialSize = consoleLog.doc.size
@@ -97,16 +141,10 @@ function updateConsoleLog(data, isInput){
     if(isInput) {
         for(var i=initialSize; i<=finalSize; i++) {
             console.log(i)
-            consoleLog.addLineClass(i, 'wrap', 'console-log-input')
+            consoleLog.addLineClass(i-1, 'wrap', 'console-log-input')
         }
     }
+    consoleLog.scrollTo(0,consoleLog.getScrollInfo().height);
 }
 
 go();
-
-/*$('sendForm').onsubmit = function (event) {
-      var p = $('phrase');
-      ws.send(p.value);
-      p.value='';
-      return false;
-}*/

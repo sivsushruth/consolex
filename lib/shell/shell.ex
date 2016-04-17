@@ -7,11 +7,9 @@ defmodule Consolex.Shell do
 
   def loop(port, websocket_handler) do
     receive do
-      {port, {:data, output}} -> 
-        IO.puts output
+      {port, {:data, output}} ->
         Consolex.reply(websocket_handler, "#{output}")
       {:send, input} ->
-        IO.inspect input
         execute_inputs(input, port)
       {:terminate} -> 
         exit(:shutdown)
@@ -22,8 +20,8 @@ defmodule Consolex.Shell do
   end
 
   defp execute_inputs(input, port) do
-    command = input
-    |> String.replace("\n", ";")
+    command_stripped_lines = Regex.replace(~r/(\n)*/, input, "\\g{1}" )
+    command = Regex.replace(~r/$/, command_stripped_lines, ";" )
     |> String.replace(";|>", "|>")
     Port.command(port, "#{command} \r\n")
   end
