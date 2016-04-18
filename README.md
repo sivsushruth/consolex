@@ -43,7 +43,7 @@ Add consolex to your list of dependencies in `mix.exs` using either
     
 ## Copyright and License
 
-Copyright (c) 2014, Sushruth Sivaramakrishnan.
+Copyright (c) 2016, Sushruth Sivaramakrishnan.
 
 Consolex source code is licensed under the MIT License.    
 
