@@ -19,6 +19,8 @@ iex -S mix
 You can choose to provide other shell options as well, like `iex -S mix phoenix.server`.
 Once the shell is launched, you can start using the editor and hit "Ctrl/Cmd + Enter" or click on the provided button to send the code to the running IEx instance and execute it. 
 
+**Warning: Due to the exposed shell for commands, it is strongly advised to refrain from using this in production environment**
+
 **Warning: This project is still in development and contains bugs. Please help by reporting issues on github**
 
 ## Features
