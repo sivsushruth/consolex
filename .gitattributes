@@ -15,3 +15,7 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Ignore js language stats
+*.js linguist-language=elixir
+*.css linguist-language=elixir
