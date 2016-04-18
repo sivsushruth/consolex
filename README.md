@@ -35,7 +35,7 @@ To attach the web console to any mix project, just add consolex to your list of 
 
 Add consolex to your list of dependencies in `mix.exs` using either 
 
-`[{:consolex, "~> 0.0.1"}]` 
+`[{:consolex, "~> 0.0.2"}]` 
 
 `[{:consolex, git: "https://github.com/sivsushruth/consolex"}]`
     
