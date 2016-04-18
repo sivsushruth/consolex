@@ -86,6 +86,7 @@ function updateCommandHistory(msg) {
     }
 
     var tmpl = $.templates("#command-history-entry");
+    $(".command-history-table").html("")
     for(var i=0; i< commandHistory.length; i++) {
         var entry = {
             id: i+1, 
@@ -95,7 +96,6 @@ function updateCommandHistory(msg) {
         var html = tmpl.render(entry);
         $(".command-history-table").append(html);
         new Clipboard('.history-code-segment');
-
     }
     if($("input[name=clear-on-send]").is(":checked")) {
         editor.setValue("")        
