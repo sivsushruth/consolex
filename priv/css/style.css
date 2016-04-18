@@ -6,6 +6,10 @@ body {
 .shell {
 }
 
+.menu-left {
+    width:100% !important; 
+}
+
 .editor-controls {
   bottom: 1em;
   z-index: 9;
