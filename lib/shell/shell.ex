@@ -21,7 +21,7 @@ defmodule Consolex.Shell do
 
   defp execute_inputs(input, port) do
     command_stripped_lines = Regex.replace(~r/(\n)*/, input, "\\g{1}" )
-    command = Regex.replace(~r/\n/, command_stripped_lines, ";" )
+    command = Regex.replace(~r/[^,.]\n/, command_stripped_lines, ";" )
     |> String.replace(";|>", "|>")
     Port.command(port, "#{command} \r\n")
   end
