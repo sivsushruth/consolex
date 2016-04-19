@@ -17,5 +17,5 @@
 *.RTF	 diff=astextplain
 
 # Ignore js language stats
-*.js linguist-language=Elixir
-*.css linguist-language=Elixir
+priv/js/* linguist-vendored
+priv/css/* linguist-vendored
