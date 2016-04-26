@@ -14,7 +14,7 @@ mix consolex.server
 
 ## Web Console Usage
 
-Open up **localhost:5984** on your browser and by default, you get 2 launch options:
+Open up **localhost:5984** on your browser and by default, you get a few launch options:
 
 ```
 iex
