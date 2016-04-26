@@ -59,7 +59,7 @@ function go() {
       consoleLog.setValue("Launch again\nReason : disconnected from shell, shell terminated")
       setTimeout(function() {go()}, 10000);
     }
-    ws.onmessage = function (e) {        
+    ws.onmessage = function (e) {
         if(!isTerminated) {
             updateConsoleLog(e.data, false)
         }
@@ -73,10 +73,11 @@ function startShell(task) {
 }
 
 function executeCode() {
-    msg = editor.getValue()
-    updateConsoleLog(msg, true)
-    updateCommandHistory(msg)
-    ws.send(msg)
+    var inputType = $("input[name=inputType]:checked").val()
+    var msg = {task: "execute", code: editor.getValue(), options: {inputType: inputType}}
+    updateConsoleLog(msg.code, true)
+    updateCommandHistory(msg.code)
+    ws.send(JSON.stringify(msg))
 }
 
 function updateCommandHistory(msg) {
@@ -87,10 +88,10 @@ function updateCommandHistory(msg) {
 
     var tmpl = $.templates("#command-history-entry");
     $(".command-history-table").html("")
-    for(var i=0; i< commandHistory.length; i++) {
+    for(var i=0; i<commandHistory.length; i++) {
         var entry = {
-            id: i+1, 
-            command: commandHistory[commandHistory.length-i-1].replace(/(?:\r\n|\r|\n)/g, '<br />'), 
+            id: i+1,
+            command: commandHistory[commandHistory.length-i-1].replace(/(?:\r\n|\r|\n)/g, '<br />'),
             rawCommand: commandHistory[commandHistory.length-i-1]
         }
         var html = tmpl.render(entry);
@@ -98,13 +99,11 @@ function updateCommandHistory(msg) {
         new Clipboard('.history-code-segment');
     }
     if($("input[name=clear-on-send]").is(":checked")) {
-        editor.setValue("")        
+        editor.setValue("")
     }
     $(".history-code-segment").hover(function() {
-            console.log($(this).find(".copy-command"))
             $(this).find(".copy-command").show()
         }, function() {
-            console.log(this)
             $(this).find(".copy-command").hide()
         }
     )
@@ -127,13 +126,11 @@ $(".clear-shell-btn").click(function() {
     consoleLog.setValue("Cleared \n")
 })
 
-function updateConsoleLog(data, isInput){
-    console.log(data)
+function updateConsoleLog(data, isInput) {
     var doc = consoleLog.getDoc();
     var cursor = doc.getCursor();
     var initialSize = consoleLog.doc.size
     var line = doc.getLine(cursor.line);
-    
     var pos = {
         line: (doc.size+5),
         ch: line.length - 1
@@ -142,11 +139,36 @@ function updateConsoleLog(data, isInput){
     var finalSize = consoleLog.doc.size
     if(isInput) {
         for(var i=initialSize; i<=finalSize; i++) {
-            console.log(i)
             consoleLog.addLineClass(i-1, 'wrap', 'console-log-input')
         }
     }
     consoleLog.scrollTo(0,consoleLog.getScrollInfo().height);
+}
+
+$(document).on("ready", function(){
+    restoreOptions();
+    if($("input[name=restoreEditor]").is(":checked")) {
+        editor.setValue(commandHistory[commandHistory.length-1]);
+    }
+    $("input").on("click", function() {
+        saveOptions();
+    })
+})
+
+function restoreOptions() {
+    var default_options = {restoreEditor: "false", inputType: "single"};
+    var options = Lockr.get("shell-options");
+    options = $.extend(true, {}, default_options, options);
+    if(options.restoreEditor=="true") {
+        $("input[name='restoreEditor']").prop('checked', "checked");
+    }
+    $("input[name='inputType'][value="+options.inputType+"]").prop('checked', "checked");
+}
+
+function saveOptions() {
+    var options = {};
+    $("#shell-options").serializeArray().map(function(x){options[x.name] = x.value;});
+    Lockr.set("shell-options", options)
 }
 
 go();

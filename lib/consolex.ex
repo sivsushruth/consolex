@@ -9,8 +9,8 @@ defmodule Consolex do
     GenServer.cast(shell, {:start_shell, task, shell})
   end
 
-  def execute(shell, command) do
-    GenServer.cast(shell, {:execute, command})
+  def execute(shell, command, options) do
+    GenServer.cast(shell, {:execute, command, options})
   end
 
   def terminate(shell) do
@@ -44,8 +44,8 @@ defmodule Consolex do
     {:noreply, [{:port, port}, {:pid, pid}]}
   end
 
-  def handle_cast({:execute, command}, [{:port, port}, {:pid, pid}]) do
-    send(port, {:send, command})
+  def handle_cast({:execute, command, options}, [{:port, port}, {:pid, pid}]) do
+    send(port, {:send, command, options})
     {:noreply, [{:port, port}, {:pid, pid}]}
   end
 

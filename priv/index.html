@@ -32,6 +32,7 @@
                 ConsoleX
             </a>
             <a href="javascript:$('.command-history-modal').modal('show')" class="item">History</a>
+            <a href="javascript:$('.options-modal').modal('show')" class="item">Options</a>
         </div>
         <a href="javascript:$('.task-modal').modal('show')" class="item">Launch</a>
         <a href="#" class="item red terminate-shell-btn shell-only">Terminate shell</a>
@@ -51,20 +52,57 @@
                         Send to shell (Ctrl/Cmd + Enter)
                     </button>
                 </div>
-            </div>    
+            </div>
             <textarea id="editor"></textarea>
         </div>
         <div class="eight wide column textarea" id='console-log-holder'>
             <textarea id="console-log">Console</textarea>
         </div>
     </div>
-    
+
+    <div class="ui small modal options-modal">
+        <div class="header">
+            <h2> Options</h2>
+        </div>
+        <div class="description shell-options">
+            <form id="shell-options">
+            <div class="ui form">
+                <div class="grouped fields">
+                    <p class="ui strong">How should I send the code to the server ?</p>
+                    <div class="field">
+                        <div class="ui radio checkbox options-radio">
+                            <input type="radio" name='inputType' value="single">
+                            <label>Send as single lines</label>
+                        </div>
+                        <br />
+                        <div class="ui radio checkbox options-radio">
+                            <input type="radio" name='inputType' value="multiple">
+                            <label>Send as multiple lines</label>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" name='restoreEditor' value="true">
+                            <label>Restore code on load</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui negative button">Reset</div>
+            <div class="ui positive button">Close</div>
+        </div>
+    </div>
+
     <div class="ui small modal command-history-modal">
         <div class="header">
             <h2> Command History <button onclick="clearCommandHistory()" class="ui button basic red erase-command-history">Erase command history</button></h2>
         </div>
         <div class="description">
-            <table class="ui table simple padded fluid command-history-table">                             
+            <table class="ui table simple padded fluid command-history-table">
             </table>
         </div>
         <div class="actions">
@@ -94,8 +132,14 @@
                     </div>
                     <div class="field">
                         <div class="ui radio checkbox">
+                            <input type="radio" name="task" value="erl">
+                            <label>erl</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
                             <input type="radio" name="task" value="other">
-                            <label>Other <input id="other-task-input" type="text" value="iex -S mix" placeholder="iex -S mix phoenix.server"></label>
+                            <label>Other <input id="other-task-input" type="text" placeholder="iex -S mix phoenix.server"></label>
                         </div>
                     </div>
                 </div>
@@ -110,7 +154,7 @@
 <script id="command-history-entry" type="text/x-jsrender">
     <tr>
         <td><h4>{{:id}}</h4></td>
-        <td> 
+        <td>
             <div data-clipboard-text="{{:rawCommand}}" class="ui segment history-code-segment">
                <p class="ui small copy-command">Click to copy</p>
                <p class="history-code">{{:command}}</p>
@@ -118,7 +162,7 @@
         </td>
         <td>
             <button class="ui button basic green open-in-editor-btn" data-raw-command="{{:rawCommand}}">Open in Editor</button>
-        </td>   
+        </td>
     </tr>
 </script>
 <script src="js/consolex.js"></script>

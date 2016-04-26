@@ -7,8 +7,8 @@ defmodule Consolex.WebSocketHandler do
 
   def reply(server, msg) do
     send(server, {:reply, msg})
-  end  
-  
+  end
+
   def websocket_init(_TransportName, req, _opts) do
     {:ok, req, {:pid, self()}}
   end
@@ -17,57 +17,64 @@ defmodule Consolex.WebSocketHandler do
     :ok
   end
 
-  def websocket_handle({:text, content}, req, {:pid, pid}) do
-    case JSX.is_json?(content) do
-      true -> 
-        {:ok, content_map} = JSX.decode(content)
-        case Map.fetch(content_map, "task") do
-          {:ok, task} -> 
-            {:ok, shell} = Consolex.start_link(pid, [])
-            Consolex.start_shell(shell, task)
-            {:reply, {:text, "Started shell..."}, req, [{:shell, shell}, {:pid, pid}]}
-           _ ->
-            {:reply, {:text, "Could not start shell"}, req, {:pid, pid}}
-        end
-      false -> 
+  def websocket_handle({:text, raw_content}, req, {:pid, pid}) do
+    case JSX.is_json?(raw_content) do
+      true ->
+        start_shell(raw_content, req, pid)
+      false ->
         {:reply, {:text, "Could not start shell"}, req, {:pid, pid}}
     end
   end
-  
-  def websocket_handle({:text, content}, req, [{:shell, shell}, {:pid, pid}]) do
-    is_json = JSX.is_json?(content)
-    content_map = case is_json do
-      true -> 
-        {:ok, content_map_decoded} = JSX.decode(content)
-        content_map_decoded
-      false -> 
-        nil
-    end
+
+  def websocket_handle({:text, raw_content}, req, [{:shell, shell}, {:pid, pid}]) do
+    is_json = JSX.is_json?(raw_content)
     case is_json do
-      true when is_map(content_map) -> 
-        case Map.fetch(content_map, "task") do
-          {:ok, "terminate"} -> 
-            Consolex.terminate(shell)    
-            {:reply, {:text, "Terminated shell"}, req, {:pid, pid}}
-           _ ->
-            {:reply, {:text, "Could not understand task"}, req, [{:shell, shell}, {:pid, pid}]}
-        end
-      _ -> 
-        Consolex.execute(shell, content)
-        {:ok, req, [{:shell, shell}, {:pid, pid}]}
-    end    
+      true ->
+        raw_content |> JSX.decode! |> shell_task(req, shell, pid)
+      _ ->
+        # Consolex.execute(shell, raw_content)
+        # {:ok, req, [{:shell, shell}, {:pid, pid}]}
+        {:reply, {:text, "Could not understand task"}, req, {:pid, pid}}
+    end
   end
-  
-  def websocket_handle({:text, _content}, req, state) do    
+
+  def websocket_handle({:text, _raw_content}, req, state) do
     {:ok, req, state}
   end
-  
+
   def websocket_info({:reply, msg}, req, shell) do
     {:reply, {:text, msg}, req, shell}
   end
 
   def websocket_info(_info, req, state) do
     {:ok, req, state}
+  end
+
+  defp start_shell(content, req, pid) do
+    content = JSX.decode!(content)
+    case Map.fetch(content, "task") do
+      {:ok, task} ->
+        {:ok, shell} = Consolex.start_link(pid, [])
+        Consolex.start_shell(shell, task)
+        {:reply, {:text, "Started shell..."}, req, [{:shell, shell}, {:pid, pid}]}
+       _ ->
+        {:reply, {:text, "Could not start shell"}, req, {:pid, pid}}
+    end
+  end
+
+  defp shell_task(content, req, shell, pid) do
+    code = Map.get(content, "code")
+    options = Map.get(content, "options")
+    case Map.get(content, "task") do
+      "terminate" ->
+        Consolex.terminate(shell)
+        {:reply, {:text, "Terminated shell"}, req, {:pid, pid}}
+      "execute" ->
+        Consolex.execute(shell, code, options)
+        {:ok, req, [{:shell, shell}, {:pid, pid}]}
+      _ ->
+        {:reply, {:text, "Could not understand task"}, req, [{:shell, shell}, {:pid, pid}]}
+    end
   end
 
 end

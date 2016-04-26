@@ -7,7 +7,7 @@ body {
 }
 
 .menu-left {
-    width:100% !important; 
+    width:100% !important;
 }
 
 .editor-controls {
@@ -20,6 +20,10 @@ body {
 
 .clear-on-send {
   padding-top: 2rem !important;
+}
+
+.options-radio {
+  padding: 0.2em;
 }
 
 .send-to-shell-btn {
@@ -35,6 +39,10 @@ body {
 }
 
 .launch-options {
+  padding-left: 1rem;
+}
+
+.shell-options {
   padding-left: 1rem;
 }
 

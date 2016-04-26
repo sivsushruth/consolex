@@ -1,29 +1,50 @@
+alias Porcelain.Process, as: Proc
 defmodule Consolex.Shell do
-  
+
   def start_port(task, websocket_handler) do
-    port = Port.open({:spawn, "#{task}"}, [:stream, :exit_status])
-    loop(port, websocket_handler)
+    proc = %Proc{pid: _pid} = Porcelain.spawn_shell("#{task}", async_in: true, out: {:send, self()})
+    loop(proc, websocket_handler)
   end
 
-  def loop(port, websocket_handler) do
+  def loop(proc, websocket_handler) do
     receive do
-      {port, {:data, output}} ->
-        Consolex.reply(websocket_handler, "#{output}")
-      {:send, input} ->
-        execute_inputs(input, port)
-      {:terminate} -> 
+      {:send, input, options} ->
+        execute_inputs(proc, input, options)
+      {:terminate} ->
         exit(:shutdown)
+      {_pid, :data, :out, output} ->
+         case should_reply?(output) do
+           true -> Consolex.reply(websocket_handler, "#{output}")
+           false -> :ok
+         end
       data->
         Consolex.reply(websocket_handler, "#{inspect data}")
-    end 
-    loop(port, websocket_handler)
+    end
+    loop(proc, websocket_handler)
   end
 
-  defp execute_inputs(input, port) do
-    command_stripped_lines = Regex.replace(~r/(\n)*/, input, "\\g{1}" )
-    command = Regex.replace(~r/\n/, command_stripped_lines, ";" )
-    |> String.replace(";|>", "|>")
-    Port.command(port, "#{command} \r\n")
+  defp should_reply?(output) do
+    !String.match?(output, ~r/(\W){3,}[\(](\d)*[\)]>/)
   end
+
+  defp execute_inputs(proc, input, options) do
+    command = Regex.replace(~r/(\n)*/, input, "\\g{1}" )
+    case Map.get(options, "inputType") do
+      "multiple" ->
+        send_input(command, proc)
+      _ ->
+        Regex.replace(~r/\n/, command, ";" )
+        |> String.replace(";|>", "|>")
+        |> send_input(proc)
+    end
+  end
+
+  defp send_input(command, proc) do
+    command
+    |> String.split("\n")
+    |> Enum.filter(&(String.strip(&1) != ""))
+    |> Enum.each(fn expr -> Proc.send_input(proc, "#{expr}\n");:timer.sleep(50) end)
+  end
+
 
 end
