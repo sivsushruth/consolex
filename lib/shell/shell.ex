@@ -33,7 +33,8 @@ defmodule Consolex.Shell do
       "multiple" ->
         send_input(command, proc)
       _ ->
-        Regex.replace(~r/\n/, command, ";" )
+        single_command = Regex.replace(~r/\n/, command, ";" )
+        Regex.replace(~r/(;)*/, single_command, "\\g{1}" )
         |> String.replace(";|>", "|>")
         |> send_input(proc)
     end
