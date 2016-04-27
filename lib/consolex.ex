@@ -25,7 +25,7 @@ defmodule Consolex do
     {:ok, {:pid, pid}}
   end
 
-  def handle_call(y, x, state) do
+  def handle_call(_, _, state) do
     {:reply, state, state}
   end
 
