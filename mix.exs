@@ -24,15 +24,14 @@ defmodule Consolex.Mixfile do
   def application do
     [
       mod: {Consolex.Server, []},
-      applications: [:logger, :ranch, :cowboy, :porcelain]
+      applications: [:logger, :ranch, :cowboy]
     ]
   end
 
   defp deps do
     [
       {:cowboy, "~> 1.0"},
-      {:exjsx, "~> 3.2"},
-      {:porcelain, "~> 2.0"}
+      {:exjsx, "~> 3.2"}
     ]
   end
 end

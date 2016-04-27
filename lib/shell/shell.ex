@@ -1,18 +1,17 @@
-alias Porcelain.Process, as: Proc
 defmodule Consolex.Shell do
 
   def start_port(task, websocket_handler) do
-    proc = %Proc{pid: _pid} = Porcelain.spawn_shell("#{task}", async_in: true, out: {:send, self()})
-    loop(proc, websocket_handler)
+    port = Port.open({:spawn, "#{task}"}, [:stream, :exit_status])
+    loop(port, websocket_handler)
   end
 
-  def loop(proc, websocket_handler) do
+  def loop(port, websocket_handler) do
     receive do
       {:send, input, options} ->
-        execute_inputs(proc, input, options)
+        execute_inputs(port, input, options)
       {:terminate} ->
         exit(:shutdown)
-      {_pid, :data, :out, output} ->
+      {port, {:data, output}} ->
          case should_reply?(output) do
            true -> Consolex.reply(websocket_handler, "#{output}")
            false -> :ok
@@ -20,31 +19,32 @@ defmodule Consolex.Shell do
       data->
         Consolex.reply(websocket_handler, "#{inspect data}")
     end
-    loop(proc, websocket_handler)
+    loop(port, websocket_handler)
   end
 
   defp should_reply?(output) do
-    !String.match?(output, ~r/(\W){3,}[\(](\d)*[\)]>/)
+    IO.inspect output
+    !String.match?(to_string(output), ~r/(\W){3,}[\(](\d)*[\)]>/)
   end
 
-  defp execute_inputs(proc, input, options) do
+  defp execute_inputs(port, input, options) do
     command = Regex.replace(~r/(\n)*/, input, "\\g{1}" )
     case Map.get(options, "inputType") do
       "multiple" ->
-        send_input(command, proc)
+        send_input(command, port)
       _ ->
         single_command = Regex.replace(~r/\n/, command, ";" )
         Regex.replace(~r/(;)*/, single_command, "\\g{1}" )
         |> String.replace(";|>", "|>")
-        |> send_input(proc)
+        |> send_input(port)
     end
   end
 
-  defp send_input(command, proc) do
+  defp send_input(command, port) do
     command
     |> String.split("\n")
     |> Enum.filter(&(String.strip(&1) != ""))
-    |> Enum.each(fn expr -> Proc.send_input(proc, "#{expr}\n");:timer.sleep(50) end)
+    |> Enum.each(fn expr ->  IO.inspect expr;Port.command(port, "#{command}\r\n");:timer.sleep(100) end)
   end
 
 
