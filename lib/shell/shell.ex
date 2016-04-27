@@ -43,9 +43,9 @@ defmodule Consolex.Shell do
   defp send_input(command, port) do
     command
     |> String.split("\n")
-    |> Enum.filter(&(String.strip(&1) != ""))
-    |> Enum.each(fn expr ->  IO.inspect expr;Port.command(port, "#{command}\r\n");:timer.sleep(100) end)
+    |> Enum.map(&String.strip/1)
+    |> Enum.filter(&(&1 != ""))
+    |> Enum.each(fn expr -> Port.command(port, "#{expr}\r\n");:timer.sleep(50) end)
   end
-
 
 end
