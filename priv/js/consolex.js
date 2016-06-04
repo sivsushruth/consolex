@@ -17,7 +17,8 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     mode: "elixir",
     theme: "text-ex-machina",
     extraKeys: {
-        'Ctrl-Enter': function(){executeCode()}
+        'Ctrl-Enter': executeCode,
+        'Cmd-Enter': executeCode
     }
 });
 
