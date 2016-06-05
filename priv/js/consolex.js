@@ -38,15 +38,24 @@ $("input[name=task]").change(function(){
     }
 })
 
-$(".launch-shell").click(function(){
-    task_choice = $("input[name=task]:checked").val()
-    if(task_choice == "other") {
-        task = $("#other-task-input").val()
-    } else {
-        task = task_choice
+function launchShell(){
+  task_choice = $("input[name=task]:checked").val()
+  if(task_choice == "other") {
+    task = $("#other-task-input").val()
+  } else {
+    task = task_choice
+  }
+  startShell(task);
+}
+
+$(".launch-shell").click(launchShell)
+$(".launch-options > .ui.form").keypress(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        $(".task-modal").modal("hide")
+        launchShell();
     }
-    startShell(task);
-})
+});
 
 ws = null;
 if (!window.WebSocket) {
