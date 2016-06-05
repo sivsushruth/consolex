@@ -24,7 +24,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
 var consoleLog = CodeMirror.fromTextArea(document.getElementById("console-log"), {
     theme: "text-ex-machina",
     lineWrapping: true,
-    readOnly: true
+    readOnly: 'nocursor'
 });
 
 $(".task-modal").modal("show");
