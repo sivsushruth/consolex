@@ -32,6 +32,7 @@
                 ConsoleX
             </a>
             <a href="javascript:$('.command-history-modal').modal('show')" class="item">History</a>
+            <a href="javascript:$('.snippets-modal').modal('show')" class="item">Snippets</a>
             <a href="javascript:$('.options-modal').modal('show')" class="item">Options</a>
         </div>
         <a href="javascript:$('.task-modal').modal('show')" class="item">Launch</a>
@@ -110,6 +111,19 @@
         </div>
     </div>
 
+    <div class="ui small modal snippets-modal">
+        <div class="header">
+            <h2> Snippets <button onclick="clearSnippets()" class="ui button basic red erase-snippets">Erase All Snippets</button></h2>
+        </div>
+        <div class="description">
+            <table class="ui table simple padded fluid snippets-table">
+            </table>
+        </div>
+        <div class="actions">
+            <div class="ui negative button">Close</div>
+        </div>
+    </div>
+
     <div class="ui small modal task-modal">
         <div class="header">
             <h2> Launch Settings </h2>
@@ -162,6 +176,25 @@
         </td>
         <td>
             <button class="ui button basic green open-in-editor-btn" data-raw-command="{{:rawCommand}}">Open in Editor</button>
+        </td>
+    </tr>
+</script>
+<script id="snippet-entry" type="text/x-jsrender">
+    <tr>
+        <td><h4>{{:name}}</h4></td>
+        <td>
+            <button class="ui button basic green open-in-editor-btn" data-raw-command="{{:rawCode}}">Open in Editor</button>
+        </td>
+        <td>
+            <button class="ui button basic red delete-snippet-btn" data-snippet-name="{{:name}}">Erase</button>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div data-clipboard-text="{{:rawCode}}" class="ui segment snippet-code-segment">
+               <p class="ui small copy-command">Click to copy</p>
+               <p class="snippet-code">{{:code}}</p>
+            </div>
         </td>
     </tr>
 </script>
