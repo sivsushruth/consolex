@@ -1,14 +1,32 @@
-var commandHistory = [];
+var commandHistory = [], snippets = [];
+var snippetName = null;
 if (commandHistoryStored = Lockr.get('commandHistory')) {
     commandHistory = commandHistoryStored;
 }
+if (snippetsStored = Lockr.get('snippets')) {
+    snippets = snippetsStored;
+}
 
 updateCommandHistory(null);
+loadSnippets()
 
 function clearCommandHistory() {
     Lockr.rm("commandHistory")
     commandHistory = []
     updateCommandHistory(null);
+}
+
+function removeSnippet(name){
+  Lockr.set("snippet:" + name)
+  snippets.splice(snippets.indexOf(name),1)
+  Lockr.set("snippets", snippets)
+  loadSnippets()
+}
+
+function clearSnippets() {
+    for(var i=0; i< snippets.length; i++) {
+        removeSnippet(snippets[i])
+    }
 }
 
 var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
@@ -18,14 +36,16 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     theme: "text-ex-machina",
     extraKeys: {
         'Ctrl-Enter': executeCode,
-        'Cmd-Enter': executeCode
+        'Cmd-Enter': executeCode,
+        'Ctrl-S': saveSnippet,
+        'Cmd-S': saveSnippet
     }
 });
 
 var consoleLog = CodeMirror.fromTextArea(document.getElementById("console-log"), {
     theme: "text-ex-machina",
     lineWrapping: true,
-    readOnly: true
+    readOnly: 'nocursor'
 });
 
 $(".task-modal").modal("show");
@@ -90,6 +110,47 @@ function executeCode() {
     ws.send(JSON.stringify(msg))
 }
 
+function saveSnippet() {
+    snippetName = prompt("Snippet name", snippetName || "sample.ex")
+    if (snippetName.length > 0) {
+      Lockr.set("snippets:" + snippetName, editor.getValue())
+      snippets.push(snippetName)
+      Lockr.set('snippets', snippets)
+      loadSnippets()
+    }
+}
+
+function loadSnippets(){
+    var tmpl = $.templates("#snippet-entry")
+    $(".snippets-table").html("")
+    for(var i=0; i< snippets.length; i++) {
+        name = snippets[i]
+        code = Lockr.get("snippets:"+name)
+        if (!code) continue;
+        var entry = {
+            name: name,
+            code: prepareCodeToView(code),
+            rawCode: code
+        }
+        var html = tmpl.render(entry)
+        $(".snippets-table").append(html)
+        new Clipboard('.snippet-code-segment')
+    }
+    allowOpenInEditor()
+    allowCopySegment()
+    allowDeleteSnippet()
+}
+
+function allowDeleteSnippet(){
+  $(".delete-snippet-btn").on("click", function(){
+     removeSnippet($(this).data("snippet-name"))
+  })
+}
+
+function prepareCodeToView(str){
+  return str.replace(/(?:\r\n|\r|\n)/g, '<br />')
+}
+
 function updateCommandHistory(msg) {
     if(msg) {
         commandHistory.push(msg)
@@ -99,10 +160,11 @@ function updateCommandHistory(msg) {
     var tmpl = $.templates("#command-history-entry");
     $(".command-history-table").html("")
     for(var i=0; i<commandHistory.length; i++) {
+        command = commandHistory[commandHistory.length-i-1]
         var entry = {
             id: i+1,
-            command: commandHistory[commandHistory.length-i-1].replace(/(?:\r\n|\r|\n)/g, '<br />'),
-            rawCommand: commandHistory[commandHistory.length-i-1]
+            command: prepareCodeToView(command),
+            rawCommand: command
         }
         var html = tmpl.render(entry);
         $(".command-history-table").append(html);
@@ -111,16 +173,24 @@ function updateCommandHistory(msg) {
     if($("input[name=clear-on-send]").is(":checked")) {
         editor.setValue("")
     }
-    $(".history-code-segment").hover(function() {
+    allowOpenInEditor()
+    allowCopySegment()
+}
+
+function allowOpenInEditor(){
+    $(".open-in-editor-btn").click(function() {
+        $('.modal').modal('hide')
+        editor.setValue($(this).data("raw-command"))
+    })
+}
+
+function allowCopySegment(){
+    $(".segment").hover(function() {
             $(this).find(".copy-command").show()
         }, function() {
             $(this).find(".copy-command").hide()
         }
     )
-    $(".open-in-editor-btn").click(function() {
-        $('.command-history-modal').modal('hide')
-        editor.setValue($(this).data("raw-command"))
-    })
 }
 
 var isTerminated = false;
