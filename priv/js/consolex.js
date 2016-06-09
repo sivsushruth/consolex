@@ -38,7 +38,9 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
         'Ctrl-Enter': executeCode,
         'Cmd-Enter': executeCode,
         'Ctrl-S': saveSnippet,
-        'Cmd-S': saveSnippet
+        'Cmd-S': saveSnippet,
+        'Cmd-K': clearShell,
+        'Ctrl-K': clearShell
     }
 });
 
@@ -202,9 +204,11 @@ $(".terminate-shell-btn").click(function(){
     go()
 })
 
-$(".clear-shell-btn").click(function() {
-    consoleLog.setValue("Cleared \n")
-})
+function clearShell() {
+  consoleLog.setValue("Cleared \n")
+}
+
+$(".clear-shell-btn").click(clearShell)
 
 function updateConsoleLog(data, isInput) {
     var doc = consoleLog.getDoc();
