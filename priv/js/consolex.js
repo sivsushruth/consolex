@@ -35,9 +35,12 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     mode: "elixir",
     theme: "text-ex-machina",
     extraKeys: {
-        'Ctrl-Enter': function(){executeCode()},
+        'Ctrl-Enter': executeCode,
+        'Cmd-Enter': executeCode,
         'Ctrl-S': saveSnippet,
-        'Cmd-S': saveSnippet
+        'Cmd-S': saveSnippet,
+        'Cmd-K': clearShell,
+        'Ctrl-K': clearShell
     }
 });
 
@@ -57,15 +60,24 @@ $("input[name=task]").change(function(){
     }
 })
 
-$(".launch-shell").click(function(){
-    task_choice = $("input[name=task]:checked").val()
-    if(task_choice == "other") {
-        task = $("#other-task-input").val()
-    } else {
-        task = task_choice
+function launchShell(){
+  task_choice = $("input[name=task]:checked").val()
+  if(task_choice == "other") {
+    task = $("#other-task-input").val()
+  } else {
+    task = task_choice
+  }
+  startShell(task);
+}
+
+$(".launch-shell").click(launchShell)
+$(".launch-options > .ui.form").keypress(function(event){
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if(keycode == '13'){
+        $(".task-modal").modal("hide")
+        launchShell();
     }
-    startShell(task);
-})
+});
 
 ws = null;
 if (!window.WebSocket) {
@@ -192,9 +204,11 @@ $(".terminate-shell-btn").click(function(){
     go()
 })
 
-$(".clear-shell-btn").click(function() {
-    consoleLog.setValue("Cleared \n")
-})
+function clearShell() {
+  consoleLog.setValue("Cleared \n")
+}
+
+$(".clear-shell-btn").click(clearShell)
 
 function updateConsoleLog(data, isInput) {
     var doc = consoleLog.getDoc();
